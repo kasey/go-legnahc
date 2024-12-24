@@ -39,5 +39,5 @@ jobs:
           name: changelog-check-binary
 
       - name: Run lint command
-        run: chmod +x _changelog && ./_changelog check -repo=$GITHUB_WORKSPACE -main-rev=main
+        run: chmod +x _changelog && ./_changelog check -repo=$GITHUB_WORKSPACE -main-rev=$GITHUB_BASE_REF
 
