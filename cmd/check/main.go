@@ -14,6 +14,7 @@ func parseArgs(args []string) (*changelog.Config, error) {
 	c := &changelog.Config{RepoConfig: changelog.RepoConfig{Owner: "prysmaticlabs", Repo: "prysm", MainRev: "origin/develop"}}
 	flags.StringVar(&c.RepoPath, "repo", "", "Path to the git repository")
 	flags.StringVar(&c.ChangesDir, "changelog-dir", "changelog", "Path to the directory containing changelog fragments for each commit")
+	flags.StringVar(&c.RepoConfig.MainRev, "main-rev", "origin/develop", "Main branch tip revision")
 	flags.Parse(args)
 	if c.RepoPath == "" {
 		return c, fmt.Errorf("repo is required")
