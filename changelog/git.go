@@ -182,37 +182,6 @@ func FindFragment(clDir string, parent, cm Commit) (Fragment, error) {
 	return frag, errNoChangelogFragment
 }
 
-/*
-func BranchCommits(r *git.Repository, branch, upstream *object.Commit) ([]commit, error) {
-	var err error
-	// compare tips
-	if branch.Hash == upstream.Hash {
-		return branch, nil
-	}
-	upstreamTree := make(map[plumbing.Hash]struct{})
-	for {
-		// move branch up to parent and compare to previous upstream commit
-		branch, err = branch.Parent(0)
-		if err != nil {
-			return nil, err
-		}
-		if branch.Hash == upstream.Hash {
-			return branch, nil
-		}
-		// check if branch tip matches any previously seen upstream commit
-		upstreamTree[upstream.Hash] = struct{}{}
-		upstream, err = upstream.Parent(0)
-		if err != nil {
-			return nil, err
-		}
-		// check if the branch matches the upstream parent
-		if branch.Hash == upstream.Hash {
-			return branch, nil
-		}
-	}
-}
-*/
-
 const maxBranchDepth = 60
 
 var errNoCommitsInBranch = errors.New("branch tip commit exists in upstream")

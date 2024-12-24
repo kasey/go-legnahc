@@ -62,13 +62,6 @@ func (c *Config) Repo() (*git.Repository, error) {
 	return r, nil
 }
 
-type Releaser struct {
-	prevBody    string
-	prevVersion string
-	cfg         *Config
-	repo        RepoConfig
-}
-
 func versionFromLine(line string) string {
 	if !versionRE.MatchString(line) {
 		return ""
@@ -113,7 +106,7 @@ func mergeEntries(fragments []Fragment) map[string][]string {
 	sections := make(map[string][]string)
 	for _, f := range fragments {
 		pr := f.Commit.prLink()
-		csecs := parseFragments(f.Lines, pr)
+		csecs := ParseFragment(f.Lines, pr)
 		for k, v := range csecs {
 			sections[k] = append(sections[k], v...)
 		}
@@ -240,7 +233,7 @@ func parseBullet(line string, pr string) string {
 	return strings.TrimRight(line, " .") + ". " + pr
 }
 
-func parseFragments(lines []string, pr string) map[string][]string {
+func ParseFragment(lines []string, pr string) map[string][]string {
 	fragments := make(map[string][]string)
 	var current string
 	for _, line := range lines {
@@ -262,4 +255,16 @@ func init() {
 	for _, s := range Sections {
 		sectionNames[s] = true
 	}
+}
+
+func ValidSections(sections map[string][]string) error {
+	for k := range sections {
+		if _, ok := sectionNames[k]; !ok {
+			if k == sectionIgnored {
+				continue
+			}
+			return fmt.Errorf("invalid section name: %s", k)
+		}
+	}
+	return nil
 }
