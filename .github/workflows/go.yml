@@ -47,7 +47,6 @@ jobs:
             changelog/**.md
 
       - name: Run lint command
-        uses: tj-actions/changed-files@v45
         env:
           ALL_ADDED_MARKDOWN: ${{ steps.new-changelog-files.outputs.added_files }}
         run: chmod +x _changelog && ./_changelog check -fragment-env=ALL_ADDED_MARKDOWN
