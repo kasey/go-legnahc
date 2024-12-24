@@ -258,6 +258,9 @@ func init() {
 }
 
 func ValidSections(sections map[string][]string) error {
+	if len(sections) == 0 {
+		return errors.New("no changelog sections found")
+	}
 	for k := range sections {
 		if _, ok := sectionNames[k]; !ok {
 			if k == sectionIgnored {
