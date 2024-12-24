@@ -50,6 +50,7 @@ There are a few benefits to using separate files over other options (simple file
   that approach, but it had a few issues like single-commit PRs, PRs that needed to add multiple sections of changelog.
 
 ### Best Practices
+
 - Put files in the `changelog` directory.
 - Pick a unique name for the changelog file - an obvious choice would be `<github user name>_<branch name>.md`.
 - Avoid editing changelogs; only add new files.
@@ -57,8 +58,12 @@ There are a few benefits to using separate files over other options (simple file
   unknown sections will be treated as invalid in the github workflow check.
 
 ### Using the tool to make a released changelog
+
 - Tag release commit and make note of the exact tag string, eg `v5.3.0`.
 ```
+$ go install github.com/kasey/go-legnahc/clog # temporary home, we will move this into prysm or an ocl repo
+$ cd $PRYSM_REPO_DIR
 $ git fetch && git checkout origin/develop
-changelog release 
+$ git checkout -b update-changelog
+# clog release -repo=$PRYSM_REPO_DIR -tag=$NEW_RELEASE_TAG
 ```

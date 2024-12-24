@@ -13,7 +13,7 @@ func parseArgs(args []string) (*changelog.Config, error) {
 	c := &changelog.Config{RepoConfig: changelog.RepoConfig{Owner: "prysmaticlabs", Repo: "prysm"}}
 	flags.StringVar(&c.RepoPath, "repo", "", "Path to the git repository")
 	flags.StringVar(&c.ChangesDir, "changelog-dir", "changelog", "Path to the directory containing changelog fragments for each commit")
-	flags.StringVar(&c.Tag, "tag", "", "Tag anchor changelog")
+	flags.StringVar(&c.Tag, "tag", "", "New release tag (must already exist in repo)")
 	flags.StringVar(&c.PreviousPath, "prev", "CHANGELOG.md", "Path to current changelog in the repo. This will be pulled from HEAD")
 	flags.BoolVar(&c.Cleanup, "cleanup", false, "Remove the changelog fragment files after generating the changelog")
 	flags.Parse(args)
