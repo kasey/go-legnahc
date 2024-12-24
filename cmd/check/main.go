@@ -25,11 +25,14 @@ func parseArgs(args []string) (*changelog.Config, *githubConf, error) {
 	envCfg := &githubConf{}
 	flags.StringVar(&envCfg.FragmentListingEnv, "fragment-env", "", "Name of the environment variable containing a list of changelog fragments")
 	flags.Parse(args)
+	if envCfg.FragmentListingEnv != "" {
+		return nil, envCfg, nil
+	}
+
 	if c.RepoPath == "" {
 		return c, nil, fmt.Errorf("repo is required")
 	}
-
-	return c, envCfg, nil
+	return c, nil, nil
 }
 
 func Run(ctx context.Context, args []string) error {
@@ -37,7 +40,7 @@ func Run(ctx context.Context, args []string) error {
 	if err != nil {
 		return err
 	}
-	if envCfg.FragmentListingEnv != "" {
+	if envCfg != nil {
 		return checkFragments(envCfg)
 	}
 	parent, commits, err := changelog.BranchCommits(cfg, cfg.RepoConfig.MainRev, cfg.Branch)
