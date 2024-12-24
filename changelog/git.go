@@ -304,20 +304,20 @@ func BranchCommits(cfg *Config, mainRev, branchRev string) (*Commit, []*Commit, 
 	}
 	devr, err := r.ResolveRevision(plumbing.Revision(mainRev))
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("could not resolve revision %s: %w", mainRev, err)
 	}
 	upstream, err := r.CommitObject(*devr)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("could not find upstream commit object for hash %x: %w", *devr, err)
 	}
 
 	branchr, err := r.ResolveRevision(plumbing.Revision(branchRev))
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("could not resolve revision %s: %w", branchRev, err)
 	}
 	branch, err := r.CommitObject(*branchr)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("could not find branch commit object for hash %x: %w", *branchr, err)
 	}
 
 	// compare tips

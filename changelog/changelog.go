@@ -48,6 +48,7 @@ type Config struct {
 	Previous     Previous
 	RepoConfig   RepoConfig
 	Cleanup      bool
+	Branch       string
 }
 
 func (c *Config) Repo() (*git.Repository, error) {
