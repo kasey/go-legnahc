@@ -1,4 +1,4 @@
-package main
+package release
 
 import (
 	"context"
@@ -8,14 +8,15 @@ import (
 	"github.com/kasey/go-legnahc/changelog"
 )
 
-func popFlags() (*changelog.Config, error) {
+func parseArgs(args []string) (*changelog.Config, error) {
+	flags := flag.NewFlagSet("release", flag.ContinueOnError)
 	c := &changelog.Config{RepoConfig: changelog.RepoConfig{Owner: "prysmaticlabs", Repo: "prysm"}}
-	flag.StringVar(&c.RepoPath, "repo", "", "Path to the git repository")
-	flag.StringVar(&c.ChangesDir, "changelog-dir", "changelog", "Path to the directory containing changelog fragments for each commit")
-	flag.StringVar(&c.Tag, "tag", "", "Tag anchor changelog")
-	flag.StringVar(&c.PreviousPath, "prev", "CHANGELOG.md", "Path to current changelog in the repo. This will be pulled from HEAD")
-	flag.BoolVar(&c.Cleanup, "cleanup", false, "Remove the changelog fragment files after generating the changelog")
-	flag.Parse()
+	flags.StringVar(&c.RepoPath, "repo", "", "Path to the git repository")
+	flags.StringVar(&c.ChangesDir, "changelog-dir", "changelog", "Path to the directory containing changelog fragments for each commit")
+	flags.StringVar(&c.Tag, "tag", "", "Tag anchor changelog")
+	flags.StringVar(&c.PreviousPath, "prev", "CHANGELOG.md", "Path to current changelog in the repo. This will be pulled from HEAD")
+	flags.BoolVar(&c.Cleanup, "cleanup", false, "Remove the changelog fragment files after generating the changelog")
+	flags.Parse(args)
 	if c.RepoPath == "" {
 		return c, fmt.Errorf("repo is required")
 	}
@@ -28,20 +29,11 @@ func popFlags() (*changelog.Config, error) {
 	return c, nil
 }
 
-func main() {
-	ctx := context.Background()
-	cfg, err := popFlags()
+func Run(ctx context.Context, args []string) error {
+	cfg, err := parseArgs(args)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
-	if err := generateChangelog(ctx, cfg); err != nil {
-		fmt.Println(err)
-		return
-	}
-}
-
-func generateChangelog(ctx context.Context, cfg *changelog.Config) error {
 	out, err := changelog.Release(ctx, cfg)
 	if err != nil {
 		return err

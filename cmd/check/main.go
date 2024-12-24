@@ -1,43 +1,31 @@
-package main
+package check
 
 import (
 	"context"
 	"flag"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/kasey/go-legnahc/changelog"
 )
 
-func popFlags() (*changelog.Config, error) {
+func parseArgs(args []string) (*changelog.Config, error) {
+	flags := flag.NewFlagSet("check", flag.ContinueOnError)
 	c := &changelog.Config{RepoConfig: changelog.RepoConfig{Owner: "prysmaticlabs", Repo: "prysm", MainRev: "origin/develop"}}
-	flag.StringVar(&c.RepoPath, "repo", "", "Path to the git repository")
-	flag.StringVar(&c.ChangesDir, "changelog-dir", "changelog", "Path to the directory containing changelog fragments for each commit")
-	flag.Parse()
+	flags.StringVar(&c.RepoPath, "repo", "", "Path to the git repository")
+	flags.StringVar(&c.ChangesDir, "changelog-dir", "changelog", "Path to the directory containing changelog fragments for each commit")
+	flags.Parse(args)
 	if c.RepoPath == "" {
 		return c, fmt.Errorf("repo is required")
 	}
 	return c, nil
 }
 
-func main() {
-	ctx := context.Background()
-	cfg, err := popFlags()
+func Run(ctx context.Context, args []string) error {
+	cfg, err := parseArgs(args)
 	if err != nil {
-		errExit(err)
+		return err
 	}
-	if err := ensureChangelog(ctx, cfg); err != nil {
-		errExit(err)
-	}
-}
-
-func errExit(err error) {
-	fmt.Println(err)
-	os.Exit(1)
-}
-
-func ensureChangelog(ctx context.Context, cfg *changelog.Config) error {
 	parent, commits, err := changelog.BranchCommits(cfg, cfg.RepoConfig.MainRev, "HEAD")
 	if err != nil {
 		return err
