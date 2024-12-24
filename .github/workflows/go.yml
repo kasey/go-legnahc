@@ -19,7 +19,7 @@ jobs:
         go-version: '1.22'
 
     - name: Build
-      run: go build -v -o _changelog ./cmd/release
+      run: go build -v -o _changelog ./cmd
     - name: Upload linter binary
       uses: actions/upload-artifact@v3
       with:
