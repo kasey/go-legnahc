@@ -42,7 +42,7 @@ from the changelog.
 There are a few benefits to using separate files over other options (simple file; deriving from pr titles):
 - Standardize changelog entry style; punctuation and automatically include backrefs to pull requests.
 - Reduce the possibility for human error. The release subcommand uses the range of commits between the
-  previous release tag (as parsed from the previously released changelog in the repo) and the newly taggeed
+  previous release tag (as parsed from the previously released changelog in the repo) and the newly tagged
   release.
 - Enables github automated checks for the existence of a changelog edit.
 - Avoids frustrating conflicts on the changelog itself.
@@ -87,7 +87,7 @@ The workflow is currently quite heavy because it has to build the tool before us
 keeping this tool as a separate repo (under the OffchainLabs org) would be setting up a process to pre-build the binary
 and copy it to the action. But building the binary each time also works.
 
-Look at the PRs against this repo for examples of the tool allowing and blocking PRs based on the changelog file.
+Look at the PRs against this repo for examples of the tool allowing and blocking PRs based on the observed changelog fragments.
 
 ### Example in prysm
 
