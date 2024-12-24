@@ -34,7 +34,6 @@ func main() {
 }
 
 func dispatch() error {
-	fmt.Printf("%v\n", os.Args)
 	args := os.Args
 	if len(args) < 2 {
 		printUsage()

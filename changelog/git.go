@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"path"
 	"regexp"
 	"strconv"
 	"strings"
@@ -143,7 +144,7 @@ func cleanupFragments(cfg *Config, fragments []Fragment) error {
 		return err
 	}
 	for _, f := range fragments {
-		if err := tree.Filesystem.Remove(f.Path); err != nil {
+		if err := tree.Filesystem.Remove(path.Join(cfg.ChangesDir, f.Path)); err != nil {
 			return fmt.Errorf("could not remove changelog fragment %s: %w", f.Path, err)
 		}
 	}

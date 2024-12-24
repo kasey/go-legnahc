@@ -59,11 +59,52 @@ There are a few benefits to using separate files over other options (simple file
 
 ### Using the tool to make a released changelog
 
-- Tag release commit and make note of the exact tag string, eg `v5.3.0`.
+Note: before running the tool, make sure you have tagged the release commit. The tool looks at individual PR commits
+to find all the information used in building the changelog.
+
 ```
 $ go install github.com/kasey/go-legnahc/clog # temporary home, we will move this into prysm or an ocl repo
 $ cd $PRYSM_REPO_DIR
 $ git fetch && git checkout origin/develop
 $ git checkout -b update-changelog
-# clog release -repo=$PRYSM_REPO_DIR -tag=$NEW_RELEASE_TAG
+$ clog release -repo=$PRYSM_REPO_DIR -tag=$NEW_RELEASE_TAG -cleanup > $PRYSM_REPO_DIR/CHANGELOG.md
+$ git commit -m "updating the changelog for $NEW_RELEASE_TAG release"
+```
+
+Note the `-cleanup` tag will `git rm` only for the changelog fragments that were found in commits between the
+release tag discovered by parsing the previously released changelog file and the tag specified in the `-tag` argument.
+So any changelog fragments that are unreleased will be left alone. At this point you can edit the resulting changelog
+file to add any desired high level context about the release.
+
+When the release subcommand parses the previously committed changelog, it discards everything in the file that comes before
+the release header where the release version is specified. So if you want your notes to persist into the next release, make
+sure to place them between the release header and the changelog sections. The release header is the markdown heading that
+looks like this: ```## [v5.2.0](https://github.com/prysmaticlabs/prysm/compare/v5.1.2...v5.2.0)```
+
+### Github workflow
+
+The workflow is currently quite heavy because it has to build the tool before using it to check commits. One advatange of
+keeping this tool as a separate repo (under the OffchainLabs org) would be setting up a process to pre-build the binary
+and copy it to the action. But building the binary each time also works.
+
+Look at the PRs against this repo for examples of the tool allowing and blocking PRs based on the changelog file.
+
+### Example in prysm
+
+The [changelog-tool](https://github.com/prysmaticlabs/prysm/tree/changelog-tool) branch in prysm has an example commit 
+converting many of the unreleased changelog entries to a single fragment file. The commit to transition to this format
+should consist of adding the github workflow files, an update to the contributing doc, and a fragment file to account for
+all merged PRs.
+
+I did not want to push a semver tag that could throw off anyone's release automation, and attempting to push my test tag
+was rejected by our repo's policies. So you need to recreate the tag locally. Here are complete steps for for trying out the
+example branch:
+
+```
+$ cd $PRYSM_REPO_DIR
+$ git fetch && git checkout changelog-tool
+$ git tag changelog-test changelog-tool
+$ go install github.com/kasey/go-legnahc/clog # temporary home, we will move this into prysm or an ocl repo
+$ clog release -repo=$PRYSM_REPO_DIR -tag=$NEW_RELEASE_TAG -cleanup > CHANGELOG.md
+$ git status # or git diff, to check out the results
 ```
