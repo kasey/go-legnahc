@@ -99,14 +99,12 @@ func TestComplete(t *testing.T) {
 	}
 
 	// temporarily uncomment this line and run the test to update the fixture.
-	requireNoError(t, os.WriteFile("testdata/expected-release.md", []byte(merged), 0644))
-	/*
-		exp, err := os.ReadFile("testdata/expected-release.md")
-		requireNoError(t, err)
-		if string(exp) != merged {
-			t.Fatalf("expected %s, got %s", exp, merged)
-		}
-	*/
+	//requireNoError(t, os.WriteFile("testdata/expected-release.md", []byte(merged), 0644))
+	exp, err := os.ReadFile("testdata/expected-release.md")
+	requireNoError(t, err)
+	if string(exp) != merged {
+		t.Fatalf("expected %s, got %s", exp, merged)
+	}
 }
 
 var errEnd = errors.New("end of permutation")

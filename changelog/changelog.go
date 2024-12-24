@@ -23,10 +23,8 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.`
 
-const preambleLines = 5
-
 // Sections represents all the possible sections in the changelog, in the desired order.
-var Sections = []string{"Added", "Changed", "Deprecated", "Removed", "Fixed", "Security", "Uncategorized"}
+var Sections = []string{"Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"}
 
 var sectionIgnored = "Ignored"
 
