@@ -4,13 +4,14 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"time"
 
 	"github.com/kasey/go-legnahc/changelog"
 )
 
 func parseArgs(args []string) (*changelog.Config, error) {
 	flags := flag.NewFlagSet("release", flag.ContinueOnError)
-	c := &changelog.Config{RepoConfig: changelog.RepoConfig{Owner: "prysmaticlabs", Repo: "prysm"}}
+	c := &changelog.Config{RepoConfig: changelog.RepoConfig{Owner: "prysmaticlabs", Repo: "prysm"}, ReleaseTime: time.Now()}
 	flags.StringVar(&c.RepoPath, "repo", "", "Path to the git repository")
 	flags.StringVar(&c.ChangesDir, "changelog-dir", "changelog", "Path to the directory containing changelog fragments for each commit")
 	flags.StringVar(&c.Tag, "tag", "", "New release tag (must already exist in repo)")

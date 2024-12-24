@@ -47,6 +47,7 @@ type Config struct {
 	RepoConfig   RepoConfig
 	Cleanup      bool
 	Branch       string
+	ReleaseTime  time.Time
 }
 
 func (c *Config) Repo() (*git.Repository, error) {
@@ -199,7 +200,7 @@ func header(cfg *Config) string {
 		cfg.Tag,
 		cfg.RepoConfig.Owner, cfg.RepoConfig.Repo,
 		cfg.Previous.Version, cfg.Tag,
-		time.Now().Format("2006-01-02"),
+		cfg.ReleaseTime.Format("2006-01-02"),
 	)
 }
 

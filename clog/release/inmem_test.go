@@ -57,27 +57,59 @@ func commitAddTag(t *testing.T, repo *git.Repository, fp string, prNum int, ctim
 	}
 }
 
-func TestComplete(t *testing.T) {
-	// Test the complete function
+func TestExamples(t *testing.T) {
+	repo, cfg, prevTime, prNum := setupTestRepo(t)
+	prNum++
+	copyFileToRepo(t, repo, "example-single.md", prevTime.Add(time.Duration(prNum)*time.Minute), prNum, "")
+	prNum++
+	copyFileToRepo(t, repo, "example-multi.md", prevTime.Add(time.Duration(prNum)*time.Minute), prNum, "")
+	var last plumbing.Hash
+	_, err := repo.CreateTag(cfg.Tag, last, nil)
+	requireNoError(t, err)
+	merged, err := changelog.Release(context.Background(), cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	exp, err := os.ReadFile("testdata/expected-examples-merged.md")
+	requireNoError(t, err)
+	if string(exp) != merged {
+		t.Fatalf("expected %s, got %s", exp, merged)
+	}
+}
+
+func setupTestRepo(t *testing.T) (*git.Repository, *changelog.Config, time.Time, int) {
+	prNum := 0
 	storage := memory.NewStorage()
 	mem := memfs.New()
 	repo, err := git.Init(storage, mem)
 	requireNoError(t, err)
-	tree, err := repo.Worktree()
-	requireNoError(t, err)
-	iter := &fixiter{values: changelog.Sections}
-
-	prNum := 0
-	// add the previous release fixture - contains previous version tag and rest of fixture
 	prevTime, err := time.Parse("2006-01-02 15:04:05", "2021-01-01 00:00:00")
+	requireNoError(t, err)
 	copyFileToRepo(t, repo, "previous.md", prevTime, prNum, "v1.0.0")
+	releaseTime, err := time.Parse("2006-01-02 15:04:05", "2021-11-11 11:11:11")
+	requireNoError(t, err)
+	cfg := &changelog.Config{
+		ReleaseTime:  releaseTime,
+		Repository:   repo,
+		ChangesDir:   "changelog",
+		Tag:          "v1.0.1",
+		PreviousPath: "changelog/previous.md",
+		RepoConfig:   changelog.RepoConfig{Owner: "prysmaticlabs", Repo: "prysm"},
+	}
+	return repo, cfg, prevTime, prNum
+}
 
+func TestComplete(t *testing.T) {
+	repo, cfg, prevTime, prNum := setupTestRepo(t)
 	// add the override fixture to make sure we leave pr links for overrides alone
 	prNum++
 	copyFileToRepo(t, repo, "override.md", prevTime.Add(time.Minute), prNum, "")
 
-	var last plumbing.Hash
+	tree, err := repo.Worktree()
+	requireNoError(t, err)
 	prNum++
+	iter := &fixiter{values: changelog.Sections}
+	var last plumbing.Hash
 	for f := iter.next(); f != nil; f = iter.next() {
 		fh, err := tree.Filesystem.Create(f.filename())
 		requireNoError(t, err)
@@ -87,13 +119,8 @@ func TestComplete(t *testing.T) {
 		prNum++
 	}
 	_, err = repo.CreateTag("v1.0.1", last, nil)
-	merged, err := changelog.Release(context.Background(), &changelog.Config{
-		Repository:   repo,
-		ChangesDir:   "changelog",
-		Tag:          "v1.0.1",
-		PreviousPath: "changelog/previous.md",
-		RepoConfig:   changelog.RepoConfig{Owner: "prysmaticlabs", Repo: "prysm"},
-	})
+	requireNoError(t, err)
+	merged, err := changelog.Release(context.Background(), cfg)
 	if err != nil {
 		t.Fatal(err)
 	}

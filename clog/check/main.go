@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/kasey/go-legnahc/changelog"
 )
@@ -17,7 +18,7 @@ type githubConf struct {
 
 func parseArgs(args []string) (*changelog.Config, *githubConf, error) {
 	flags := flag.NewFlagSet("check", flag.ContinueOnError)
-	c := &changelog.Config{RepoConfig: changelog.RepoConfig{Owner: "prysmaticlabs", Repo: "prysm"}}
+	c := &changelog.Config{RepoConfig: changelog.RepoConfig{Owner: "prysmaticlabs", Repo: "prysm"}, ReleaseTime: time.Now()}
 	flags.StringVar(&c.RepoPath, "repo", "", "Path to the git repository")
 	flags.StringVar(&c.ChangesDir, "changelog-dir", "changelog", "Path to the directory containing changelog fragments for each commit")
 	flags.StringVar(&c.RepoConfig.MainRev, "main-rev", "origin/develop", "Main branch tip revision")
