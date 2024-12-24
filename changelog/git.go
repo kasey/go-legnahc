@@ -182,37 +182,6 @@ func FindFragment(clDir string, parent, cm Commit) (Fragment, error) {
 	return frag, errNoChangelogFragment
 }
 
-/*
-func BranchCommits(r *git.Repository, branch, upstream *object.Commit) ([]commit, error) {
-	var err error
-	// compare tips
-	if branch.Hash == upstream.Hash {
-		return branch, nil
-	}
-	upstreamTree := make(map[plumbing.Hash]struct{})
-	for {
-		// move branch up to parent and compare to previous upstream commit
-		branch, err = branch.Parent(0)
-		if err != nil {
-			return nil, err
-		}
-		if branch.Hash == upstream.Hash {
-			return branch, nil
-		}
-		// check if branch tip matches any previously seen upstream commit
-		upstreamTree[upstream.Hash] = struct{}{}
-		upstream, err = upstream.Parent(0)
-		if err != nil {
-			return nil, err
-		}
-		// check if the branch matches the upstream parent
-		if branch.Hash == upstream.Hash {
-			return branch, nil
-		}
-	}
-}
-*/
-
 const maxBranchDepth = 60
 
 var errNoCommitsInBranch = errors.New("branch tip commit exists in upstream")
@@ -304,20 +273,20 @@ func BranchCommits(cfg *Config, mainRev, branchRev string) (*Commit, []*Commit, 
 	}
 	devr, err := r.ResolveRevision(plumbing.Revision(mainRev))
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("could not resolve revision %s: %w", mainRev, err)
 	}
 	upstream, err := r.CommitObject(*devr)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("could not find upstream commit object for hash %x: %w", *devr, err)
 	}
 
 	branchr, err := r.ResolveRevision(plumbing.Revision(branchRev))
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("could not resolve revision %s: %w", branchRev, err)
 	}
 	branch, err := r.CommitObject(*branchr)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("could not find branch commit object for hash %x: %w", *branchr, err)
 	}
 
 	// compare tips

@@ -20,11 +20,13 @@ jobs:
 
     - name: Build
       run: go build -v -o _changelog ./cmd
+
     - name: Upload linter binary
       uses: actions/upload-artifact@v3
       with:
         name: changelog-check-binary
         path: _changelog
+
   run-changelog-check:
     runs-on: ubuntu-latest
     needs: build-changelog-check
@@ -38,6 +40,14 @@ jobs:
         with:
           name: changelog-check-binary
 
-      - name: Run lint command
-        run: chmod +x _changelog && ./_changelog check -repo=$GITHUB_WORKSPACE
+      - name: Get new changelog files
+        id: new-changelog-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            log/**.md
 
+      - name: Run lint command
+        env:
+          ALL_ADDED_MARKDOWN: ${{ steps.new-changelog-files.outputs.added_files }}
+        run: chmod +x _changelog && ./_changelog check -fragment-env=ALL_ADDED_MARKDOWN
