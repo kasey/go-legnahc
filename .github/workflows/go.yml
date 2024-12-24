@@ -20,6 +20,7 @@ jobs:
 
     - name: Build
       run: go build -v -o _changelog ./cmd
+
     - name: Upload linter binary
       uses: actions/upload-artifact@v3
       with:
@@ -44,7 +45,7 @@ jobs:
         uses: tj-actions/changed-files@v45
         with:
           files: |
-            changelog/**.md
+            log/**.md
 
       - name: Run lint command
         env:
